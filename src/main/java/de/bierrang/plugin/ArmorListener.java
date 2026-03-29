@@ -20,6 +20,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
@@ -82,7 +84,8 @@ public class ArmorListener implements Listener {
             }
 
             if (hasEnchant(item, "gift")) {
-                target.addPotionEffect(org.bukkit.potion.PotionEffect.withAmbient(org.bukkit.potion.PotionEffectType.POISON, false, 100, 1));
+                // FIX: Neuer Konstruktor für 1.21
+                target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 1, false, true, true));
             }
 
             if (hasEnchant(item, "gier")) {
@@ -232,17 +235,26 @@ public class ArmorListener implements Listener {
 
     private void applyGiantStats(Player p) {
         AttributeInstance scale = p.getAttribute(Attribute.GENERIC_SCALE);
-        if (scale != null) scale.addModifier(new AttributeModifier(UUID.randomUUID(), "bier.giant", 0.4, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+        if (scale != null) {
+            // FIX: ADD_SCALAR für prozentuale Änderung (Base * Amount)
+            scale.addModifier(new AttributeModifier(UUID.randomUUID(), "bier.giant", 0.4, AttributeModifier.Operation.ADD_SCALAR));
+        }
         AttributeInstance health = p.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-        if (health != null) health.addModifier(new AttributeModifier(UUID.randomUUID(), "bier.giant_hp", 10, AttributeModifier.Operation.ADD_NUMBER));
+        if (health != null) {
+            health.addModifier(new AttributeModifier(UUID.randomUUID(), "bier.giant_hp", 10, AttributeModifier.Operation.ADD_NUMBER));
+        }
         p.sendMessage(ChatColor.DARK_GREEN + "Modus: Riese");
     }
 
     private void applyTankStats(Player p) {
         AttributeInstance speed = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-        if (speed != null) speed.addModifier(new AttributeModifier(UUID.randomUUID(), "bier.tank_slow", -0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+        if (speed != null) {
+            speed.addModifier(new AttributeModifier(UUID.randomUUID(), "bier.tank_slow", -0.3, AttributeModifier.Operation.ADD_SCALAR));
+        }
         AttributeInstance armor = p.getAttribute(Attribute.GENERIC_ARMOR);
-        if (armor != null) armor.addModifier(new AttributeModifier(UUID.randomUUID(), "bier.tank_armor", 10, AttributeModifier.Operation.ADD_NUMBER));
+        if (armor != null) {
+            armor.addModifier(new AttributeModifier(UUID.randomUUID(), "bier.tank_armor", 10, AttributeModifier.Operation.ADD_NUMBER));
+        }
         p.sendMessage(ChatColor.DARK_BLUE + "Modus: Panzer");
     }
 
@@ -254,7 +266,6 @@ public class ArmorListener implements Listener {
     // --- HELPER ---
     private boolean isBeaconItem(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return false;
-        // Key wieder beacon_armor
         return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin, "beacon_armor"), PersistentDataType.BYTE);
     }
 
