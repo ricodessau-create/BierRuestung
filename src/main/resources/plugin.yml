@@ -1,0 +1,14 @@
+name: BierRuestung
+version: 1.0
+main: de.bierrang.plugin.BierRuestung
+api-version: '1.21'
+commands:
+  bierarmor:
+    description: Gibt die Rüstungen
+    usage: /bierarmor
+  beaconbook:
+    description: Gibt Spezialbücher
+    usage: /beaconbook <type>
+permissions:
+  bierarmor.admin:
+    default: op
