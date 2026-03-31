@@ -6,6 +6,7 @@ public class BierRuestung extends JavaPlugin {
 
     private static BierRuestung instance;
     private ArmorManager armorManager;
+    private ArmorGUI armorGUI;
 
     @Override
     public void onEnable() {
@@ -13,18 +14,20 @@ public class BierRuestung extends JavaPlugin {
         saveDefaultConfig();
 
         armorManager = new ArmorManager(this);
+        armorGUI = new ArmorGUI(this);
 
-        getCommand("bierarmor").setExecutor(new ArmorCommand(this));
+        getCommand("armorGUI").setExecutor(new ArmorGUICommand(this));
         getCommand("beaconbook").setExecutor(new BookCommand(this));
         
         getServer().getPluginManager().registerEvents(new ArmorListener(this), this);
+        getServer().getPluginManager().registerEvents(armorGUI, this);
 
-        // Rezepte registrieren
         RecipeManager.registerRecipes(this);
 
-        getLogger().info("BierRuestung geladen!");
+        getLogger().info("BierRuestung v1.1.0 geladen!");
     }
 
     public static BierRuestung getInstance() { return instance; }
     public ArmorManager getArmorManager() { return armorManager; }
+    public ArmorGUI getArmorGUI() { return armorGUI; }
 }
