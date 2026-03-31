@@ -10,8 +10,6 @@ public class RecipeManager {
 
     public static void registerRecipes(BierRuestung plugin) {
         
-        // --- BEACON RÜSTUNG (Aus Beacons) ---
-        
         // Helm
         ItemStack helmet = plugin.getArmorManager().createBeaconArmor(Material.DIAMOND_HELMET);
         NamespacedKey keyH = new NamespacedKey(plugin, "beacon_helmet");
