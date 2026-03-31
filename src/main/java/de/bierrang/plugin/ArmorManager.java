@@ -19,18 +19,15 @@ public class ArmorManager {
         this.plugin = plugin;
     }
 
-    // Beacon Rüstung erstellen
     public ItemStack createBeaconArmor(Material baseMat) {
-        ItemStack item = new ItemStack(baseMat); // Basis ist DIAMANT
+        ItemStack item = new ItemStack(baseMat);
         ItemMeta meta = item.getItemMeta();
         
         meta.setDisplayName("§6Beacon " + getFriendlyName(baseMat));
         meta.setUnbreakable(true);
         
-        // Marker für Admin-Schutz
         meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "beacon_armor"), PersistentDataType.BYTE, (byte) 1);
 
-        // STATS: Besser als Netherite
         addAttribute(meta, Attribute.GENERIC_ARMOR, getArmorValue(baseMat, 25), EquipmentSlotGroup.ARMOR);
         addAttribute(meta, Attribute.GENERIC_ARMOR_TOUGHNESS, getArmorValue(baseMat, 15), EquipmentSlotGroup.ARMOR);
         addAttribute(meta, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0.2, EquipmentSlotGroup.ARMOR);
@@ -40,7 +37,6 @@ public class ArmorManager {
         return item;
     }
 
-    // Spezial Enchants anwenden
     public ItemStack applySpecialEnchant(ItemStack item, String id, int level) {
         if (item == null || !item.hasItemMeta()) return null;
         ItemMeta meta = item.getItemMeta();
@@ -91,4 +87,4 @@ public class ArmorManager {
             default -> String.valueOf(n);
         };
     }
-}
+    }
