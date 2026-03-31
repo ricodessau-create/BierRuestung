@@ -34,7 +34,6 @@ public class ArmorListener implements Listener {
         this.plugin = plugin;
     }
 
-    // 1. ADMIN SCHUTZ
     @EventHandler
     public void onAnvil(InventoryClickEvent e) {
         if (e.getInventory().getType() != InventoryType.ANVIL) return;
@@ -51,13 +50,11 @@ public class ArmorListener implements Listener {
         }
     }
 
-    // 2. KAMPF EFFEKTE
     @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(EntityDamageByEntityEvent e) {
         if (!(e.getDamager() instanceof Player p)) return;
         if (!(e.getEntity() instanceof LivingEntity target)) return;
 
-        // Hand + Rüstung scannen
         ItemStack mainHand = p.getInventory().getItemInMainHand();
         List<ItemStack> itemsToCheck = new ArrayList<>(Arrays.asList(p.getInventory().getArmorContents()));
         itemsToCheck.add(mainHand);
@@ -84,7 +81,6 @@ public class ArmorListener implements Listener {
             }
 
             if (hasEnchant(item, "gift")) {
-                // FIX: Neuer Konstruktor für 1.21
                 target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 1, false, true, true));
             }
 
@@ -98,14 +94,12 @@ public class ArmorListener implements Listener {
         }
     }
 
-    // 3. MINING EFFEKTE (SCHMELZEN, EXPLOSIV, TELEKINESE)
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent e) {
         if (e.isCancelled()) return;
         Player p = e.getPlayer();
         Block block = e.getBlock();
         
-        // Hand + Rüstung scannen
         ItemStack handItem = p.getInventory().getItemInMainHand();
         List<ItemStack> itemsToCheck = new ArrayList<>(Arrays.asList(p.getInventory().getArmorContents()));
         itemsToCheck.add(handItem);
@@ -122,15 +116,14 @@ public class ArmorListener implements Listener {
         }
 
         if (!hasTelekinese && !hasSchmelzen && !hasExplosiv) return;
-        if (block.getState() instanceof Container) return; // Keine Kisten klauen
+        if (block.getState() instanceof Container) return;
 
-        // EXPLOSIV (3x3)
         if (hasExplosiv) {
             int radius = 1;
             for (int x = -radius; x <= radius; x++) {
                 for (int y = -radius; y <= radius; y++) {
                     for (int z = -radius; z <= radius; z++) {
-                        if (x == 0 && y == 0 && z == 0) continue; // Hauptblock überspringen
+                        if (x == 0 && y == 0 && z == 0) continue;
                         
                         Location loc = block.getLocation().clone().add(x, y, z);
                         Block relative = loc.getBlock();
@@ -150,7 +143,6 @@ public class ArmorListener implements Listener {
             }
         }
 
-        // HAUPTBLOCK
         if (hasSchmelzen) {
             dropSmelted(p, block);
             e.setDropItems(false);
@@ -163,7 +155,6 @@ public class ArmorListener implements Listener {
         }
     }
 
-    // Helper: Schmelzen
     private void dropSmelted(Player p, Block block) {
         Material type = block.getType();
         ItemStack result = getSmeltedResult(type);
@@ -178,7 +169,6 @@ public class ArmorListener implements Listener {
         block.setType(Material.AIR);
     }
 
-    // Helper: Telekinese
     private void dropToInv(Player p, Block block) {
         Collection<ItemStack> drops = block.getDrops(p.getInventory().getItemInMainHand());
         if (!drops.isEmpty()) {
@@ -188,7 +178,6 @@ public class ArmorListener implements Listener {
         block.setType(Material.AIR);
     }
 
-    // Helper: Smelting Rezepte
     private ItemStack getSmeltedResult(Material ore) {
         if (ore == Material.IRON_ORE || ore == Material.DEEPSLATE_IRON_ORE) return new ItemStack(Material.IRON_INGOT);
         if (ore == Material.GOLD_ORE || ore == Material.DEEPSLATE_GOLD_ORE) return new ItemStack(Material.GOLD_INGOT);
@@ -198,7 +187,6 @@ public class ArmorListener implements Listener {
         return null;
     }
 
-    // 4. XP BOOST
     @EventHandler
     public void onXP(PlayerExpChangeEvent e) {
         Player p = e.getPlayer();
@@ -210,7 +198,6 @@ public class ArmorListener implements Listener {
         }
     }
 
-    // 5. RIESE & TANK Attribute
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
@@ -236,7 +223,6 @@ public class ArmorListener implements Listener {
     private void applyGiantStats(Player p) {
         AttributeInstance scale = p.getAttribute(Attribute.GENERIC_SCALE);
         if (scale != null) {
-            // FIX: ADD_SCALAR für prozentuale Änderung (Base * Amount)
             scale.addModifier(new AttributeModifier(UUID.randomUUID(), "bier.giant", 0.4, AttributeModifier.Operation.ADD_SCALAR));
         }
         AttributeInstance health = p.getAttribute(Attribute.GENERIC_MAX_HEALTH);
@@ -263,7 +249,6 @@ public class ArmorListener implements Listener {
         if (scale != null) scale.setBaseValue(1.0);
     }
 
-    // --- HELPER ---
     private boolean isBeaconItem(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return false;
         return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin, "beacon_armor"), PersistentDataType.BYTE);
