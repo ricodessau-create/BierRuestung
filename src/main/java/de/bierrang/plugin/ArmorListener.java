@@ -203,8 +203,9 @@ public class ArmorListener implements Listener {
         Player p = e.getPlayer();
         String currentMode = activeModes.getOrDefault(p.getUniqueId(), "none");
         
-        boolean hasGiant = hasSetEnchant(p, "giant");
-        boolean hasTank = hasSetEnchant(p, "tank");
+        // NEUE LOGIK: Prüft ob ALLE 4 Teile den Enchant haben
+        boolean hasGiant = hasFullSetEnchant(p, "giant");
+        boolean hasTank = hasFullSetEnchant(p, "tank");
         
         String newMode = "none";
         if (hasGiant) newMode = "giant";
@@ -229,7 +230,7 @@ public class ArmorListener implements Listener {
         if (health != null) {
             health.addModifier(new AttributeModifier(UUID.randomUUID(), "bier.giant_hp", 10, AttributeModifier.Operation.ADD_NUMBER));
         }
-        p.sendMessage(ChatColor.DARK_GREEN + "Modus: Riese");
+        p.sendMessage(ChatColor.DARK_GREEN + "Set-Bonus aktiviert: Riese");
     }
 
     private void applyTankStats(Player p) {
@@ -241,7 +242,7 @@ public class ArmorListener implements Listener {
         if (armor != null) {
             armor.addModifier(new AttributeModifier(UUID.randomUUID(), "bier.tank_armor", 10, AttributeModifier.Operation.ADD_NUMBER));
         }
-        p.sendMessage(ChatColor.DARK_BLUE + "Modus: Panzer");
+        p.sendMessage(ChatColor.DARK_BLUE + "Set-Bonus aktiviert: Panzer");
     }
 
     private void resetAttributes(Player p) {
@@ -259,10 +260,11 @@ public class ArmorListener implements Listener {
         return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin, "custom_enchant_" + id), PersistentDataType.INTEGER);
     }
 
-    private boolean hasSetEnchant(Player p, String id) {
+    // NEUE METHODE: Prüft ob alle 4 Teile den Enchant haben
+    private boolean hasFullSetEnchant(Player p, String id) {
         for (ItemStack item : p.getInventory().getArmorContents()) {
-            if (hasEnchant(item, id)) return true;
+            if (!hasEnchant(item, id)) return false;
         }
-        return false;
+        return true;
     }
 }
